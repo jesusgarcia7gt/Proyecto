@@ -1,22 +1,22 @@
 # Erigon
 
 {% hint style="info" %}
-**Erigon** - Successor to OpenEthereum, Erigon is an implementation of Ethereum (aka "Ethereum client"), on the efficiency frontier, written in Go.
+**Erigon** - Sucesor de OpenEthereum, Erigon es una implementación de Ethereum (también conocido como "cliente Ethereum"), en la frontera de la eficiencia, escrita en Go.
 {% endhint %}
 
-## Overview
+## Descripción General
 
-#### Official Links
+#### Enlaces oficiales
 
-| Subject       | Link                                                                                                     |
-| ------------- | -------------------------------------------------------------------------------------------------------- |
-| Releases      | [https://github.com/ledgerwatch/erigon/releases](https://github.com/ledgerwatch/erigon/releases)         |
-| Documentation | [https://erigon.readthedocs.io/en/latest/index.html](https://erigon.readthedocs.io/en/latest/index.html) |
-| Website       | [https://erigon.substack.com](https://erigon.substack.com/)                                              |
+| El Tema         | Enlace|
+| -------------   | -------------------------------------------------------------------------------------------------------- |
+| Lanzamientos    | [https://github.com/ledgerwatch/erigon/releases](https://github.com/ledgerwatch/erigon/releases)         |
+| Documentación   | [https://erigon.readthedocs.io/en/latest/index.html](https://erigon.readthedocs.io/en/latest/index.html) |
+| Sitio Web       | [https://erigon.substack.com](https://erigon.substack.com/)                                              |
 
-### 1. Initial configuration
+### 1. Configuración Inicial
 
-Create a service user for the execution service, create data directory and assign ownership.
+Cree un usuario de servicio para el servicio de ejecución, cree un directorio de datos y asigne la propiedad.
 
 ```bash
 sudo adduser --system --no-create-home --group execution
@@ -24,28 +24,27 @@ sudo mkdir -p /var/lib/erigon
 sudo chown -R execution:execution /var/lib/erigon
 ```
 
-Install dependencies.
+Instalar dependencias.
 
 ```bash
 sudo apt install curl libsnappy-dev libc6-dev jq libc6 unzip -y
 ```
 
-### 2. Install Binaries
+### 2. Instalar Binarios
 
-* Downloading binaries is often faster and more convenient.
-* Building from source code can offer better compatibility and is more aligned with the spirit of FOSS (free open source software).
-
+* La descarga de archivos binarios suele ser más rápida y cómoda.
+* Construir a partir de código fuente puede ofrecer una mejor compatibilidad y está más alineado con el espíritu de FOSS (software gratuito de código abierto).
 <details>
 
 <summary>Option 1 - Download binaries</summary>
 
-Run the following to automatically download the latest linux release, un-tar and cleanup.
+Ejecute lo siguiente para descargar automáticamente la última versión de Linux, descomprimir y limpiar.
 
 ```bash
 RELEASE_URL="https://api.github.com/repos/ledgerwatch/erigon/releases/latest"
 BINARIES_URL="$(curl -s $RELEASE_URL | jq -r ".assets[] | select(.name) | .browser_download_url" | grep linux_amd64)"
 
-echo Downloading URL: $BINARIES_URL
+eco URL de descarga: $BINARIES_URL
 
 cd $HOME
 wget -O erigon.tar.gz $BINARIES_URL
@@ -53,7 +52,7 @@ tar -xzvf erigon.tar.gz -C $HOME
 rm erigon.tar.gz
 ```
 
-Install the binaries.
+Instale los binarios.
 
 ```bash
 sudo mv $HOME/erigon /usr/local/bin/erigon
@@ -65,7 +64,7 @@ sudo mv $HOME/erigon /usr/local/bin/erigon
 
 <summary>Option 2 - Build from source code</summary>
 
-Install Go dependencies. Latest version [available here](https://go.dev/dl/).
+Instale las dependencias de Go. Última versión [disponible aquí](https://go.dev/dl/).
 
 ```bash
 wget -O go.tar.gz https://go.dev/dl/go1.20.5.linux-amd64.tar.gz
@@ -74,21 +73,21 @@ echo export PATH=$PATH:/usr/local/go/bin >> $HOME/.bashrc
 source $HOME/.bashrc
 ```
 
-Verify Go is properly installed by checking the version and cleanup files.
+Verifique que Go esté instalado correctamente verificando la versión y los archivos de limpieza.
 
 ```bash
 go version
 rm go.tar.gz
 ```
 
-Install build dependencies.
+Instalar dependencias de compilación.
 
 ```bash
 sudo apt-get update
 sudo apt install build-essential git
 ```
 
-Build the binary.
+Construye el binario.
 
 ```bash
 mkdir -p ~/git
@@ -103,36 +102,36 @@ git checkout $latestTag
 make erigon
 ```
 
-Install the binary.
+Intala el binario
 
 <pre class="language-bash"><code class="lang-bash"><strong>sudo cp $HOME/git/erigon/build/bin/erigon /usr/local/bin
 </strong></code></pre>
 
 </details>
 
-### **3. Setup and configure systemd**
+### **3. Instalar y configurar systemd**
 
-Create a **systemd unit file** to define your `execution.service` configuration.
+Cree un **archivo de unidad systemd** para definir su configuración `execution.service`.
 
 ```bash
 sudo nano /etc/systemd/system/execution.service
 ```
 
-Paste the following configuration into the file.
+Pegue la siguiente configuración en el archivo.
 
-```shell
-[Unit]
-Description=Erigon Execution Layer Client service for Mainnet
-Wants=network-online.target
-After=network-online.target
-Documentation=https://www.coincashew.com
+```cáscara
+[Unidad]
+Descripción=Servicio de cliente de capa de ejecución de Erigon para Mainnet
+Quiere = red-en línea.objetivo
+Después=red-en línea.objetivo
+Documentación = https://www.coincashew.com
 
-[Service]
-Type=simple
-User=execution
-Group=execution
-Restart=on-failure
-RestartSec=3
+[Servicio]
+Tipo=simple
+Usuario=ejecución
+Grupo=ejecución
+Reinicio=on-falla
+ReinicioSegudo=3
 KillSignal=SIGINT
 TimeoutStopSec=900
 ExecStart=/usr/local/bin/erigon \
@@ -149,29 +148,29 @@ ExecStart=/usr/local/bin/erigon \
    --prune.r.before=11052984 \
    --authrpc.jwtsecret=/secrets/jwtsecret
 
-[Install]
-WantedBy=multi-user.target
+[Instalar]
+WantedBy=multiusuario.objetivo
 ```
 
-To exit and save, press `Ctrl` + `X`, then `Y`, then `Enter`.
+Para salir y guardar, presione `Ctrl` + `X`, luego `Y`, luego `Enter`.
 
-Run the following to enable auto-start at boot time.
+Ejecute lo siguiente para habilitar el inicio automático en el momento del arranque.
 
-```bash
+```golpecito
 sudo systemctl daemon-reload
-sudo systemctl enable execution
+sudo systemctl habilitar la ejecución
 ```
 
-Finally, start your execution layer client and check it's status.
+Finalmente, inicie su cliente de capa de ejecución y verifique su estado.
 
-```bash
-sudo systemctl start execution
-sudo systemctl status execution
+```golpecito
+sudo systemctl inicia la ejecución
+ejecución del estado de sudo systemctl
 ```
 
-Press `Ctrl` + `C` to exit the status.
+Presione `Ctrl` + `C` para salir del estado.
 
-### 4. Helpful execution client commands
+### 4. Comandos útiles del cliente de ejecución
 
 {% tabs %}
 {% tab title="View Logs" %}
@@ -179,13 +178,13 @@ Press `Ctrl` + `C` to exit the status.
 sudo journalctl -fu execution | ccze
 ```
 
-A properly functioning **Erigon** execution client will indicate "Handling new payload". For example,
+Un cliente de ejecución **Erigon** que funcione correctamente indicará "Manejando nueva carga útil". Por ejemplo,
 
 ```
-erigon[3]: [INFO] [09-29|03:36:24.689] [NewPayload] Handling new payload        height=19999 hash=0xea060...2846a907ceb4
-erigon[3]: [INFO] [09-29|03:36:25.278] [updateForkchoice] Fork choice update: flushing in-memory state (built by previous newPayload)
-erigon[3]: [INFO] [09-29|03:36:25.280] RPC Daemon notified of new headers       from=19998 to=19999 hash=0xeeed..710b597 header sending=13.32µs log sending=290ns
-erigon[3]: [INFO] [09-29|03:36:25.280] head updated                             hash=0xea06098ad5e...5e5f43 number=20000
+erigon[3]: [INFO] [09-29|03:36:24.689] [NewPayload] Manejo de nueva carga útil       height=19999 hash=0xea060...2846a907ceb4
+erigon[3]: [INFO] [09-29|03:36:25.278] [updateForkchoice] Actualización de elección de bifurcación: vaciado del estado en memoria (creado por newPayload anterior)
+erigon[3]: [INFO] [09-29|03:36:25.280] RPC Daemon notificado de nuevos encabezados       from=19998 to=19999 hash=0xeeed..710b597 header sending=13.32µs log sending=290ns
+erigon[3]: [INFO] [09-29|03:36:25.280] ¿cabeza actualizada                            hash=0xea06098ad5e...5e5f43 number=20000
 ```
 {% endtab %}
 
@@ -208,11 +207,11 @@ sudo systemctl status execution
 {% endtab %}
 
 {% tab title="Reset Database" %}
-Common reasons to reset the database can include:
+Las razones comunes para restablecer la base de datos pueden incluir:
 
-* Recovering from a corrupted database due to power outage or hardware failure
-* Re-syncing to reduce disk space usage
-* Upgrading to a new storage format
+* Recuperación de una base de datos dañada debido a un corte de energía o falla de hardware
+* Resincronización para reducir el uso de espacio en disco
+* Actualización a un nuevo formato de almacenamiento
 
 ```bash
 sudo systemctl stop execution
@@ -220,12 +219,12 @@ sudo rm -rf /var/lib/erigon/*
 sudo systemctl restart execution
 ```
 
-Time to re-sync the execution client can take a few hours up to a day.
+El tiempo para volver a sincronizar el cliente de ejecución puede tardar desde algunas horas hasta un día.
 {% endtab %}
 {% endtabs %}
 
-Now that your execution client is configured and started, proceed to the next step on setting up your consensus client.
+Ahora que su cliente de ejecución está configurado e iniciado, continúe con el siguiente paso para configurar su cliente de consenso.
 
 {% hint style="warning" %}
-If you're checking the logs and see any warnings or errors, please be patient as these will normally resolve once both your execution and consensus clients are fully synced to the Ethereum network.
+Si está revisando los registros y ve alguna advertencia o error, tenga paciencia, ya que normalmente se resolverán una vez que tanto su cliente de ejecución como el de consenso estén completamente sincronizados con la red Ethereum.
 {% endhint %}
